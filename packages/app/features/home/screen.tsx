@@ -23,17 +23,28 @@ import {
   Cloud,
   Zap,
   Star,
-  ExternalLink
+  ExternalLink,
+  LogOut,
+  User
 } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/navigation'
+import { useAuth } from '../auth/context'
 
 export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
+  const { user, tenant, logout } = useAuth()
   const linkTarget = pagesMode ? '/pages-example-user' : '/user'
   const linkProps = useLink({
     href: `${linkTarget}/nate`,
   })
+
+  const handleLogout = () => {
+    logout()
+    if (typeof window !== 'undefined') {
+      window.location.href = '/'
+    }
+  }
 
   return (
     <YStack flex={1} bg="$background" minHeight="100vh">
@@ -68,11 +79,30 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
               <SwitchThemeButton />
             </>
           )}
+          
+          {/* User Info */}
+          <XStack gap="$2" alignItems="center">
+            <View width="$3" height="$3" borderRadius="$2" bg="$blue8" alignItems="center" justifyContent="center">
+              <User size={12} color="$blue10" />
+            </View>
+            <Text fontSize="$2" color="$color10">
+              {user?.name || 'User'}
+            </Text>
+          </XStack>
+          
+          {/* Logout Button */}
+          <Button 
+            size="$3" 
+            circular 
+            icon={LogOut} 
+            onPress={handleLogout}
+            chromeless
+          />
         </XStack>
       </XStack>
 
       <YStack flex={1} pt="$20" pb="$4" px="$4" gap="$8" alignItems="center">
-        {/* Welcome Section */}
+        {/* Welcome Section with Tenant Info */}
         <YStack gap="$4" alignItems="center" maxWidth={600}>
           <H1 color="$color12" textAlign="center" fontSize="$12" $sm={{ fontSize: "$10" }}>
             Utility Intelligence Suite
@@ -80,6 +110,13 @@ export function HomeScreen({ pagesMode = false }: { pagesMode?: boolean }) {
           <Paragraph color="$color10" size="$5" textAlign="center" maxWidth={500}>
             Unified access to all your tools for smarter, safer operations.
           </Paragraph>
+          {tenant && (
+            <View bg="$color2" px="$3" py="$2" borderRadius="$2">
+              <Text fontSize="$2" color="$color10">
+                {tenant.name}
+              </Text>
+            </View>
+          )}
         </YStack>
 
         {/* Resilience Score Banner */}
