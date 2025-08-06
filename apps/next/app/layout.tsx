@@ -3,7 +3,7 @@ import { NextTamaguiProvider } from 'app/provider/NextTamaguiProvider'
 import { AuthClientProvider } from './AuthClientProvider'
 
 export const metadata: Metadata = {
-  title: 'Urbint Unified - Utility Intelligence Suite',
+  title: 'Urbint Unified - Operational Resilience Platform',
   description: 'Unified access to all your tools for smarter, safer operations',
   icons: '/favicon.ico',
 }

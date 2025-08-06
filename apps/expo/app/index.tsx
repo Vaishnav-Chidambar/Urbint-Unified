@@ -1,4 +1,5 @@
 import { HomeScreen } from 'app/features/home/screen'
+import { ProtectedRoute } from 'app/features/auth/protected-route'
 import { Stack } from 'expo-router'
 
 export default function Screen() {
@@ -9,7 +10,9 @@ export default function Screen() {
           title: 'Home',
         }}
       />
-      <HomeScreen />
+      <ProtectedRoute>
+        <HomeScreen />
+      </ProtectedRoute>
     </>
   )
 }

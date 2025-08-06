@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { Platform } from 'react-native'
 
 interface User {
   id: string
@@ -28,6 +29,29 @@ interface AuthContextType {
   setTenant: (tenant: Tenant) => void
 }
 
+// Simple storage utility that works on both web and React Native
+const storage = {
+  getItem: (key: string): string | null => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      return localStorage.getItem(key)
+    }
+    // For React Native, we'll use a simple in-memory storage
+    return null
+  },
+  setItem: (key: string, value: string): void => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      localStorage.setItem(key, value)
+    }
+    // For React Native, we'll skip storage for now
+  },
+  removeItem: (key: string): void => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      localStorage.removeItem(key)
+    }
+    // For React Native, we'll skip storage for now
+  }
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -39,27 +63,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check localStorage for existing session (only on client side)
-        if (typeof window !== 'undefined') {
-          const storedUser = localStorage.getItem('urbint_user')
-          const storedTenant = localStorage.getItem('urbint_tenant')
-          
-          if (storedUser && storedTenant) {
-            try {
-              const userData = JSON.parse(storedUser)
-              const tenantData = JSON.parse(storedTenant)
-              
-              // Validate session (in real app, you'd verify with your backend)
-              if (userData && tenantData) {
-                setUser(userData)
-                setTenant(tenantData)
-              }
-            } catch (parseError) {
-              console.error('Failed to parse stored auth data:', parseError)
-              // Clear invalid data
-              localStorage.removeItem('urbint_user')
-              localStorage.removeItem('urbint_tenant')
+        // Check storage for existing session
+        const storedUser = storage.getItem('urbint_user')
+        const storedTenant = storage.getItem('urbint_tenant')
+        
+        if (storedUser && storedTenant) {
+          try {
+            const userData = JSON.parse(storedUser)
+            const tenantData = JSON.parse(storedTenant)
+            
+            // Validate session (in real app, you'd verify with your backend)
+            if (userData && tenantData) {
+              setUser(userData)
+              setTenant(tenantData)
             }
+          } catch (parseError) {
+            console.error('Failed to parse stored auth data:', parseError)
+            // Clear invalid data
+            storage.removeItem('urbint_user')
+            storage.removeItem('urbint_tenant')
           }
         }
       } catch (error) {
@@ -89,11 +111,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         permissions: ['read', 'write']
       }
       
-      // Store in localStorage (only on client side)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('urbint_user', JSON.stringify(mockUser))
-        localStorage.setItem('urbint_tenant', JSON.stringify(selectedTenant))
-      }
+      // Store in storage
+      storage.setItem('urbint_user', JSON.stringify(mockUser))
+      storage.setItem('urbint_tenant', JSON.stringify(selectedTenant))
       
       setUser(mockUser)
       setTenant(selectedTenant)
@@ -116,19 +136,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Mock SSO user data
       const mockUser: User = {
-        id: 'sso-user-456',
-        email: 'user@sso.com',
-        name: 'SSO User',
+        id: `sso-user-${selectedTenant.ssoProvider}`,
+        email: `user@${selectedTenant.domain}`,
+        name: `${selectedTenant.ssoProvider.charAt(0).toUpperCase() + selectedTenant.ssoProvider.slice(1)} User`,
         role: 'user',
         tenantId: selectedTenant.id,
         permissions: ['read', 'write', 'admin']
       }
       
-      // Store in localStorage (only on client side)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('urbint_user', JSON.stringify(mockUser))
-        localStorage.setItem('urbint_tenant', JSON.stringify(selectedTenant))
-      }
+      // Store in storage
+      storage.setItem('urbint_user', JSON.stringify(mockUser))
+      storage.setItem('urbint_tenant', JSON.stringify(selectedTenant))
       
       setUser(mockUser)
       setTenant(selectedTenant)
@@ -143,10 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('urbint_user')
-      localStorage.removeItem('urbint_tenant')
-    }
+    storage.removeItem('urbint_user')
+    storage.removeItem('urbint_tenant')
     setUser(null)
     setTenant(null)
   }

@@ -1,16 +1,18 @@
-import { useState } from 'react'
-import { Button, useIsomorphicLayoutEffect } from 'tamagui'
-import { useThemeSetting, useRootTheme } from '@tamagui/next-theme'
+import { Button } from 'tamagui'
+import { Moon, Sun } from '@tamagui/lucide-icons'
+import { useThemeContext } from './ThemeProvider'
 
 export const SwitchThemeButton = () => {
-  const themeSetting = useThemeSetting()
-  const [theme] = useRootTheme()
+  const { theme, toggleTheme } = useThemeContext()
 
-  const [clientTheme, setClientTheme] = useState<string | undefined>('light')
-
-  useIsomorphicLayoutEffect(() => {
-    setClientTheme(themeSetting.forcedTheme || themeSetting.current || theme)
-  }, [themeSetting.current, themeSetting.resolvedTheme])
-
-  return <Button onPress={themeSetting.toggle}>Change theme: {clientTheme}</Button>
+  return (
+    <Button
+      size="$3"
+      circular
+      icon={theme === 'light' ? Moon : Sun}
+      onPress={toggleTheme}
+      chromeless
+      color="$color10"
+    />
+  )
 }

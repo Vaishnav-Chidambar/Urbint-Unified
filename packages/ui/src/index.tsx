@@ -4,7 +4,9 @@ export * from './MyComponent'
 export { config } from '@my/config'
 export * from './CustomToast'
 export * from './SwitchThemeButton'
-export * from './SwitchRouterButton'
+export * from './ThemeProvider'
+export * from './Logo'
+export * from './LoadingAnimation'
 
 // Re-export commonly used components for convenience
 export {
@@ -25,5 +27,7 @@ export {
   Sheet,
   View,
   Input,
-  Label
+  Label,
+  Select,
+  Checkbox
 } from 'tamagui'

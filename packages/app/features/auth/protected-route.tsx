@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react'
+import { View, Text, ActivityIndicator } from 'react-native'
 import { useAuth } from './context'
 import { AuthScreen } from './screen'
 
@@ -11,16 +12,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
+      <View style={{ 
+        flex: 1, 
         justifyContent: 'center', 
         alignItems: 'center', 
-        height: '100vh',
-        backgroundColor: '#f5f5f5',
-        fontFamily: 'system-ui, -apple-system, sans-serif'
+        backgroundColor: '#f5f5f5'
       }}>
-        <div>Loading...</div>
-      </div>
+        <ActivityIndicator size="large" color="#0066cc" />
+        <Text style={{ marginTop: 16, fontSize: 16, color: '#333' }}>Loading...</Text>
+      </View>
     )
   }
 
