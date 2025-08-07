@@ -56,7 +56,7 @@ const UrbintLogo = ({ size = 24, color = "$blue10" }: { size?: number; color?: s
     width={size} 
     height={size} 
     borderRadius={size / 2}
-    bg={color}
+    bg="$blue10"
     alignItems="center" 
     justifyContent="center"
   >
@@ -101,7 +101,7 @@ export function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const [step, setStep] = useState<'login' | 'sso-redirect'>('login')
 
-  const handleSSOLogin = async () => {
+  const handleSSOLogin = async (provider: 'okta' | 'azure' | 'google') => {
     setIsLoading(true)
     
     try {
@@ -181,39 +181,20 @@ export function AuthScreen() {
 
   return (
     <YStack flex={1} bg="$background" minHeight="100vh">
-      {/* Header with Urbint Logo */}
-      <XStack
-        position="absolute"
-        width="100%"
-        t="$6"
-        gap="$6"
-        justify="space-between"
-        alignItems="center"
-        px="$4"
-        zIndex={100}
-      >
-        <View width="$4" height="$4" />
-        
-        <XStack gap="$4" alignItems="center">
-          <View 
-            width="$8" 
-            height="$8" 
-            borderRadius="$4" 
-            bg="#003F53" 
-            alignItems="center" 
-            justifyContent="center"
-          >
-            <UrbintLogo size={24} color="white" />
-          </View>
-          <H2 color="$color12" fontWeight="bold">Urbint</H2>
-        </XStack>
-        
-        <View width="$4" height="$4" />
-      </XStack>
+      <YStack flex={1} pt="$6" pb="$4" px="$4" gap="$8" alignItems="center" justifyContent="center">
+        <YStack gap="$8" alignItems="center" maxWidth={500} width="100%">
+          
+          {/* Title Section */}
+          <YStack gap="$3" alignItems="center">
+            <H1 color="$color12" textAlign="center" fontSize="$10" fontWeight="700">
+              Welcome to Urbint Unified Platform
+            </H1>
+            <Paragraph color="$color10" textAlign="center" size="$4">
+              Sign in to access your organization's tools
+            </Paragraph>
+          </YStack>
 
-      <YStack flex={1} pt="$20" pb="$4" px="$4" gap="$8" alignItems="center" justifyContent="center">
-        <YStack gap="$6" alignItems="center" maxWidth={500} width="100%">
-          {/* Floating Card with Login Form */}
+          {/* Login Form - Floating Card */}
           <Card 
             bg="$color1" 
             p="$6" 
@@ -227,166 +208,142 @@ export function AuthScreen() {
             elevation={8}
             width="100%"
           >
-            <YStack gap="$6" alignItems="center">
-              {/* Title */}
-              <YStack gap="$2" alignItems="center">
-                <H1 color="$color12" textAlign="center" fontSize="$8" fontWeight="700">
-                  Welcome back
-                </H1>
-                <Paragraph color="$color10" textAlign="center" size="$3">
-                  Sign in to access your organization's tools
-                </Paragraph>
-              </YStack>
-
-              {/* Organization Selection */}
-              <YStack gap="$2" width="100%">
-                <Label htmlFor="organization" fontSize="$3" color="$color11" fontWeight="500">
-                  Organization
+            <YStack gap="$5" width="100%">
+              {/* Email Field */}
+              <YStack gap="$2">
+                <Label htmlFor="email" fontSize="$3" color="$color11" fontWeight="500">
+                  Email
                 </Label>
-                <Select 
-                  value={selectedTenant.id}
-                  onValueChange={(value) => {
-                    const tenant = mockTenants.find(t => t.id === value)
-                    if (tenant) setSelectedTenant(tenant)
-                  }}
-                >
-                  <Select.Trigger size="$4" bg="$color2" borderColor="$color6" borderRadius="$3">
-                    <XStack gap="$2" alignItems="center">
-                      <View 
-                        width="$4" 
-                        height="$4" 
-                        borderRadius="$2" 
-                        bg="$blue2" 
-                        alignItems="center" 
-                        justifyContent="center"
-                      >
-                        <Building size={12} color="$blue10" />
-                      </View>
-                      <Select.Value placeholder="Select Organization" />
-                    </XStack>
-                    <ChevronDown size={16} />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {mockTenants.map((tenant, index) => (
-                      <Select.Item key={tenant.id} index={index} value={tenant.id}>
-                        <XStack gap="$2" alignItems="center">
-                          <View 
-                            width="$4" 
-                            height="$4" 
-                            borderRadius="$2" 
-                            bg="$blue2" 
-                            alignItems="center" 
-                            justifyContent="center"
-                          >
-                            <Building size={12} color="$blue10" />
-                          </View>
-                          <YStack gap="$1">
-                            <Text fontSize="$3" fontWeight="500">{tenant.name}</Text>
-                            <Text fontSize="$2" color="$color10">{tenant.domain}</Text>
-                          </YStack>
-                        </XStack>
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
+                <Input
+                  id="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  size="$4"
+                  bg="$color2"
+                  borderColor="$color6"
+                  borderRadius="$3"
+                />
               </YStack>
 
-              {/* Direct Login Form */}
-              <YStack gap="$4" width="100%">
-                <YStack gap="$2">
-                  <Label htmlFor="email" fontSize="$3" color="$color11" fontWeight="500">
-                    Email
-                  </Label>
+              {/* Password Field */}
+              <YStack gap="$2">
+                <Label htmlFor="password" fontSize="$3" color="$color11" fontWeight="500">
+                  Password
+                </Label>
+                <XStack gap="$2" alignItems="center">
                   <Input
-                    id="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChangeText={setEmail}
+                    id="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    flex={1}
                     size="$4"
                     bg="$color2"
                     borderColor="$color6"
                     borderRadius="$3"
                   />
-                </YStack>
-
-                <YStack gap="$2">
-                  <Label htmlFor="password" fontSize="$3" color="$color11" fontWeight="500">
-                    Password
-                  </Label>
-                  <XStack gap="$2" alignItems="center">
-                    <Input
-                      id="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChangeText={setPassword}
-                      secureTextEntry={!showPassword}
-                      flex={1}
-                      size="$4"
-                      bg="$color2"
-                      borderColor="$color6"
-                      borderRadius="$3"
-                    />
-                    <Button
-                      size="$4"
-                      circular
-                      icon={showPassword ? EyeOff : Eye}
-                      onPress={() => setShowPassword(!showPassword)}
-                      chromeless
-                      color="$color10"
-                    />
-                  </XStack>
-                </YStack>
-
-                {/* Forgot Password Link */}
-                <Text
-                  fontSize="$3"
-                  color="$blue10"
-                  textDecorationLine="underline"
-                  alignSelf="flex-start"
-                  pressStyle={{ opacity: 0.7 }}
-                >
-                  Did you forget your password?
-                </Text>
-
-                {/* Login Button */}
-                <Button
-                  size="$4"
-                  bg="$color12"
-                  color="$color1"
-                  fontWeight="600"
-                  onPress={handleDirectLogin}
-                  disabled={isLoading || !email || !password}
-                  borderRadius="$3"
-                >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                </Button>
+                  <Button
+                    size="$4"
+                    circular
+                    icon={showPassword ? EyeOff : Eye}
+                    onPress={() => setShowPassword(!showPassword)}
+                    chromeless
+                    color="$color10"
+                  />
+                </XStack>
               </YStack>
 
-              {/* Separator */}
-              <XStack alignItems="center" gap="$3" width="100%">
-                <Separator flex={1} />
-                <Text fontSize="$2" color="$color8" fontWeight="500">OR</Text>
-                <Separator flex={1} />
-              </XStack>
+              {/* Forgot Password Link */}
+              <Text
+                fontSize="$3"
+                color="$blue10"
+                textDecorationLine="underline"
+                alignSelf="flex-start"
+                pressStyle={{ opacity: 0.7 }}
+              >
+                Did you forget your password?
+              </Text>
 
-              {/* SSO Login Option */}
-              <YStack gap="$3" width="100%">
-                <Text fontSize="$3" color="$color11" textAlign="center" fontWeight="500">
-                  Sign in with your organization's SSO provider
-                </Text>
+              {/* Login Button */}
+              <Button
+                size="$4"
+                bg="$color12"
+                color="$color1"
+                fontWeight="600"
+                onPress={handleDirectLogin}
+                disabled={isLoading || !email || !password}
+                borderRadius="$3"
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </YStack>
+          </Card>
+
+          {/* SSO Options - Floating Card */}
+          <Card 
+            bg="$color1" 
+            p="$6" 
+            borderRadius="$4" 
+            borderWidth={1}
+            borderColor="$color6"
+            shadowColor="$color8"
+            shadowOffset={{ width: 0, height: 4 }}
+            shadowOpacity={0.1}
+            shadowRadius={12}
+            elevation={8}
+            width="100%"
+          >
+            <YStack gap="$4" width="100%">
+              <Text fontSize="$3" color="$color11" textAlign="center" fontWeight="500">
+                Or sign in with your organization's SSO provider
+              </Text>
+              
+              {/* Horizontal SSO Buttons */}
+              <XStack gap="$3" justifyContent="center" flexWrap="wrap">
+                <Button
+                  size="$4"
+                  bg="$blue10"
+                  color="white"
+                  icon={ExternalLink}
+                  onPress={() => handleSSOLogin('okta')}
+                  disabled={isLoading}
+                  borderRadius="$3"
+                  flex={1}
+                  minWidth={120}
+                >
+                  {isLoading ? '...' : 'Okta'}
+                </Button>
                 
                 <Button
                   size="$4"
                   bg="$blue10"
                   color="white"
                   icon={ExternalLink}
-                  onPress={handleSSOLogin}
+                  onPress={() => handleSSOLogin('azure')}
                   disabled={isLoading}
                   borderRadius="$3"
+                  flex={1}
+                  minWidth={120}
                 >
-                  {isLoading ? 'Redirecting...' : `Sign in with ${selectedTenant.ssoProvider.toUpperCase()}`}
+                  {isLoading ? '...' : 'Microsoft'}
                 </Button>
-              </YStack>
+                
+                <Button
+                  size="$4"
+                  bg="$blue10"
+                  color="white"
+                  icon={ExternalLink}
+                  onPress={() => handleSSOLogin('google')}
+                  disabled={isLoading}
+                  borderRadius="$3"
+                  flex={1}
+                  minWidth={120}
+                >
+                  {isLoading ? '...' : 'Google'}
+                </Button>
+              </XStack>
             </YStack>
           </Card>
 

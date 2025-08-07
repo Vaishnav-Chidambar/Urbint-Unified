@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { LoadingScreen } from '../../../../packages/app/features/loading/screen'
 import { Button, YStack, Text, XStack } from '@my/ui'
